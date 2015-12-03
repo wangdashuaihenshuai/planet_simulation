@@ -8,7 +8,7 @@ function Planet (options, ctx, id) {
     this.y = options.y;
     this.vX = options.vX;
     this.vY = options.vY;
-    this.quantity = constant.PI*this.width*this.width*constant.DENSITY;
+    this.quantity = utils.caculateQuantity(this.width);
     this.color = options.color || '#000000';
 
 
