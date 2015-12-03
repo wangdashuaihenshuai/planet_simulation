@@ -1,0 +1,21 @@
+{
+  "name": "my_planet",
+  "version": "0.0.1",
+  "description": "plant",
+  "main": "index.js",
+  "dependencies":{
+    "underscore": "^1.8.3",
+    "webpack": "^1.12.1",
+    "express": "3.4.7"
+  },
+  "scripts": {
+    "test": "npm run test",
+    "watch": "webpack --watch",
+    "build": "webpack -p"
+  },
+  "keywords": [
+    "planet"
+  ],
+  "author": "jinhai.wang",
+  "license": "MIT"
+}
