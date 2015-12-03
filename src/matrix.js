@@ -5,7 +5,7 @@ module.exports = exports = Matrix;
 function Matrix() {
     this.matrixF = {};
     this.matrixList = [];
-    this.allF = 0;
+    this.allF = {fX:0, fY:0, fAll:0};
 }
 
 Matrix.prototype.isExists = function (plantId) {
@@ -37,5 +37,19 @@ Matrix.prototype.updateF = function (plantId, F) {
 Matrix.prototype.flush = function () {
     _.map(this.matrixList, function (value, key) {
         value.caculate = false;
+    });
+};
+
+Matrix.prototype.getAllF = function () {
+    _.map(this.matrixF, function (value, key){
+        this.allF.fX = this.allF.fx + value.f.fX;
+        this.allF.fY = this.allF.fY + value.f.fY;
+    });
+    this.allF.fAll = utils.caculateFAll(this.allF);
+};
+
+Matrix.prototype.filterPlanetId = function () {
+    _.filter(this.matrixList, function (_id) {
+        return ! this.matrixF[_id].caculate;
     });
 };

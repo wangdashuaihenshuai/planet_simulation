@@ -95,13 +95,14 @@
 	    this.ctx.fill(circle);
 	};
 
-	Planet.prototype.move = function (fX, fY) {
+	Planet.prototype.move = function (fAll) {
+	    var fX = fAll.fX;
+	    var fY = fAll.fY;
 	    this.vX = this.vX + (fX * constant.TIME/ this.quantity);
 	    this.vY = this.vY + (fY * constant.TIME/ this.quantity);
 	    this.x = this.x + this.vX * constant.TIME;
 	    this.y = this.y + this.vY * constant.TIME;
 	};
-
 
 
 /***/ },
