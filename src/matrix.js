@@ -14,24 +14,24 @@ Matrix.prototype.isExists = function (plantId) {
 
 // f = { f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}
 Matrix.prototype.addF = function (plantId, F) {
-    if (this.isExists()) return;
+    if (this.isExists(plantId)) return;
     this.matrixList.push(plantId);
     this.matrixF[plantId] = F;
 };
 
 Matrix.prototype.removeF = function (plantId) {
-    if (!this.isExists()) return;
+    if (!this.isExists(plantId)) return;
     this.matrixList.pop(this.matrixList.indexOf(plantId));
     delete this.matrixF[plantId];
 };
 
 // F = { f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}
 Matrix.prototype.updateF = function (plantId, F) {
-    if (!this.isExists()) return;
-    var changed = utils.caculateFChange(this.matrixF[plantId].f.fAll, F.fAll);
+    if (!this.isExists(plantId)) return;
+    var changed = utils.caculateFChange(this.matrixF[plantId].f.fAll, F.f.fAll);
     F.changed = changed;
     F.caculate = true;
-    this.matrixF[plantId].f = F;
+    this.matrixF[plantId] = F;
 };
 
 Matrix.prototype.flush = function () {
@@ -46,10 +46,11 @@ Matrix.prototype.getAllF = function () {
         this.allF.fY = this.allF.fY + value.f.fY;
     });
     this.allF.fAll = utils.caculateFAll(this.allF);
+    return this.allF.fAll;
 };
 
 Matrix.prototype.filterPlanetId = function () {
-    _.filter(this.matrixList, function (_id) {
+    return _.filter(this.matrixList, function (_id) {
         return ! this.matrixF[_id].caculate;
     });
 };

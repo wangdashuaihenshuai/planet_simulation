@@ -11,7 +11,6 @@ function Planet (options, ctx, id) {
     this.quantity = utils.caculateQuantity(this.width);
     this.color = options.color || '#000000';
 
-
     this.ctx = ctx;
     this.id = id;
 }

@@ -1,4 +1,4 @@
-exports.G = 9.8;
+exports.G = 10;
 exports.DENSITY = 0.01;
-exports.PI = 3;
+exports.PI = 5;
 exports.TIME = 1;
