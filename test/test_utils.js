@@ -9,13 +9,15 @@ describe('utils', function () {
         it('caculate fx and fy sum vector fAll',
             function () {
                 var f1 = {
-                    fX:3,
-                    fY:4
+                    fX: 3,
+                    fY: 4,
+                    fAll: 5
                 };
                 assert.equal(5, utils.caculateFAll(f1));
                 var f2 = {
-                    fX:5,
-                    fY:12
+                    fX: 5,
+                    fY: 12,
+                    fAll: 13
                 };
                 assert.equal(13, utils.caculateFAll(f2));
             }

@@ -12,26 +12,26 @@ function Matrix() {
 }
 
 /**
- * @param  {int}
- * @return {Boolean}
+ * judge if the planet in the matrix.
+ * @param  {Int} planetId - the id of planet.
+ * @return {Boolean} - return if the planet in the matrix.
  */
 Matrix.prototype.isExists = function (planetId) {
     return (this.matrixList.indexOf(planetId) == -1) ? false : true;
 };
 
 /**
- * @param {int}
- * @param {object F}
+ * @param {Int} planetId - the id of planet.
+ * @param {Object} fInfo - the object of fInfo,{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}.
  */
-Matrix.prototype.addF = function (planetId, F) {
+Matrix.prototype.addF = function (planetId, fInfo) {
     if (this.isExists(planetId)) return;
     this.matrixList.push(planetId);
-    console.log(F, 'matrix addF');
-    this.matrixF[planetId] = F;
+    this.matrixF[planetId] = fInfo;
 };
 
 /**
- * @param  {int} planetId 
+ * @param {Int} planetId - the id of planet.
  */
 Matrix.prototype.removeF = function (planetId) {
     if (!this.isExists(planetId)) return;
@@ -39,46 +39,45 @@ Matrix.prototype.removeF = function (planetId) {
     delete this.matrixF[planetId];
 };
 
-// F = { f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}
 /**
- * @param  {[type]}
- * @param  {[type]}
- * @return {[type]}
+ * update the fInfo in the matrix.
+ * @param {Int} planetId - the id of planet.
+ * @param {Object} fInfo - the object of fInfo,{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}.
  */
-Matrix.prototype.updateF = function (planetId, F) {
+Matrix.prototype.updateF = function (planetId, fInfo) {
     if (!this.isExists(planetId)) return;
-    var changed = utils.caculateFChange(this.matrixF[planetId].f.fAll, F.f.fAll);
-    F.changed = changed;
-    F.caculate = true;
-    this.matrixF[planetId] = F;
+    var changed = utils.caculateFChange(this.matrixF[planetId].f.fAll, fInfo.f.fAll);
+    fInfo.changed = changed;
+    fInfo.caculate = true;
+    this.matrixF[planetId] = fInfo;
 };
 
 /**
- * @return {[type]}
+ * let all the Finfo.caculate = false.
  */
 Matrix.prototype.flush = function () {
-    _.map(this.matrixF, function (F, planetId) {
-        F.caculate = false;
+    _.map(this.matrixF, function (fInfo, planetId) {
+        fInfo.caculate = false;
     });
 };
 
 /**
- * @return {[type]}
+ * @return {Object} fAll - the object of F, {fX:float, fY:float, fAll:float}.
  */
 Matrix.prototype.getAllF = function () {
     var self = this;
     this.allF = {fX:0, fY:0, fAll:0};
-    console.log(this.matrixF,"getAllF");
-    _.map(this.matrixF, function (_f, key){
-        self.allF.fX = self.allF.fX + _f.fX;
-        self.allF.fY = self.allF.fY + _f.fY;
+    _.map(this.matrixF, function (_fInfo, key){
+        self.allF.fX = self.allF.fX + _fInfo.f.fX;
+        self.allF.fY = self.allF.fY + _fInfo.f.fY;
     });
     this.allF.fAll = utils.caculateFAll(this.allF);
-    return this.allF.fAll;
+    return this.allF;
 };
 
 /**
- * @return {[type]}
+ * filter the planets witch not caculate.
+ * @return {Arry} filterPlanetId - filter the not caculate planets.
  */
 Matrix.prototype.filterPlanetId = function () {
     var filterPlanetId = [];

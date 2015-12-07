@@ -44,7 +44,6 @@ describe('matrix', function () {
 
                 var f2 = { f: {fX: 5, fY: 12, fAll: 12}, changed: 1, caculate: true};
 
-                console.log(planetId, f2);
                 matrix.updateF(planetId, f2);
                 expect(f2.f).to.deep.equal(matrix.matrixF[planetId].f);
                 assert.equal(1.4, matrix.matrixF[planetId].changed);
@@ -94,20 +93,21 @@ describe('matrix', function () {
             }
         );
     });
+
     describe('.getAllF()', function () {
         it('get All F in this planet',
             function () {
                 var matrix = new Matrix();
 
                 var planetId_1 = 1;
-                var f1 = {fX: 2, fY: 3, fAll: 5};
-                matrix.addF(planetId_1, f1);
+                var fInfo1 = {f:{fX: 2, fY: 3, fAll: 5}, changed:1, caculate:true};
+                matrix.addF(planetId_1, fInfo1);
 
                 var planetId_2 = 2;
-                var f2 = {fX: 3, fY: 9, fAll: 13};
-                matrix.addF(planetId_2, f2);
+                var fInfo2 = {f:{fX: 3, fY: 9, fAll: 13}, changed:1, caculate:true};
+                matrix.addF(planetId_2, fInfo2);
 
-                assert.equal(13, matrix.getAllF());
+                expect({ fX: 5, fY: 12, fAll: 13 }).to.deep.equal(matrix.getAllF());
             }
         );
     });

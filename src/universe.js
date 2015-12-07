@@ -7,31 +7,20 @@ var utils = require('./utils.js');
 module.exports = exports = Universe;
 
 /**
- * Represents a book.
- * @constructor
- * @param {string} title - The title of the book.
- * @param {string} author - The author of the book.
- */
-
-
-/**
  * the object of universe.
  * @constructor
  * @param {string} canvas - the id of canvas.
  */
-function Universe(canvasId) {
-    this.id = canvasId;
+function Universe() {
     this.planetId = 0;
     this.planets = [];
     this.planetsList = {};
-    this.canvas = document.getElementById(this.id);
-    this.ctx = this.canvas.getContext("2d");
-    this.background = '#ffffff';
+    this.background = '#3eb1bf';
 }
 
 /**
  * add a planet in universe.
- * @param {object} options - the options of a planet,{}.
+ * @param {object} options - the options of a planet,{width:float, x:float, y:float, vX:float, vY:float, color:string}.
  */
 Universe.prototype.addPlanet = function (options) {
     // init planet
@@ -64,31 +53,39 @@ Universe.prototype.caculate = function () {
         _.map(_planet.matrix.filterPlanetId(), function (planetId) {
             self.updatePlanetF(_planet, self.planetsList[planetId]);
         });
+    });
+
+    _.map(this.planets, function (_planet) {
         _planet.matrix.flush();
     });
 };
 
 /**
  * add the f between two planets.
- * @param {object} planet1Info - the planet instance.
- * @param {object} planet2Info - the planet instance.
+ * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+ * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
  */
 Universe.prototype.addPlanetF = function (planet1Info, planet2Info) {
     var caculateF = utils.caculateF(planet1Info.planet, planet2Info.planet);
-    planet1Info.matrix.addF(planet2Info.planet.id, caculateF.f1);
-    planet2Info.matrix.addF(planet1Info.planet.id, caculateF.f2);
+    f1Info = {f:caculateF.f1, changed: 1, caculate:true};
+    f2Info = {f:caculateF.f2, changed: 1, caculate:true};
+    planet1Info.matrix.addF(planet2Info.planet.id, f1Info);
+    planet2Info.matrix.addF(planet1Info.planet.id, f2Info);
 };
 
 
 /**
  * update the f between two planets.
- * @param {object} planet1Info - the planet instance.
- * @param {object} planet2Info - the planet instance.
+ * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+ * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
  */
 Universe.prototype.updatePlanetF = function (planet1Info, planet2Info) {
     var caculateF = utils.caculateF(planet1Info.planet, planet2Info.planet);
-    planet1Info.matrix.updateF(planet2Info.planet.planetId, caculateF.f1);
-    planet2Info.matrix.updateF(planet1Info.planet.planetId, caculateF.f2);
+    f1Info = {f:caculateF.f1, changed: 1, caculate:true};
+    f2Info = {f:caculateF.f2, changed: 1, caculate:true};
+    planet1Info.matrix.updateF(planet2Info.planet.id, f1Info);
+    planet2Info.matrix.updateF(planet1Info.planet.id, f2Info);
+
 };
 
 /**
@@ -98,6 +95,16 @@ Universe.prototype.move = function () {
     _.map(this.planets, function (_planet) {
         _planet.planet.move(_planet.matrix.getAllF());
     });
+};
+
+/**
+ * init draw contents.
+ * @param {string} canvasId - the id of <canvas></canvas>.
+ */
+Universe.prototype.initDraw = function (canvasId) {
+    this.id = canvasId;
+    this.canvas = document.getElementById(this.id);
+    this.ctx = this.canvas.getContext("2d");
 };
 
 /**
@@ -114,6 +121,7 @@ Universe.prototype.draw = function () {
  */
 Universe.prototype.clear = function () {
     this.ctx.fillStyle = this.background;
+    console.log(this.background);
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 };

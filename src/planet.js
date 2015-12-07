@@ -4,9 +4,9 @@ var utils = require('./utils.js');
 exports = module.exports = Planet;
 
 /**
- * @param {[type]}
- * @param {[type]}
- * @param {[type]}
+ * @param {object} options - the options of planet, {width:float, x:float, y:float, vX:float, vY:float, color:string}.
+ * @param {object} ctx - the ctx of canvas.
+ * @param {number} id - id of planet, int.
  */
 function Planet (options, ctx, id) {
     this.width = options.width;
@@ -14,15 +14,23 @@ function Planet (options, ctx, id) {
     this.y = options.y;
     this.vX = options.vX;
     this.vY = options.vY;
-    this.quantity = utils.caculateQuantity(this.width);
-    this.color = options.color || '#000000';
-
+    this.density = options.density || constant.DENSITY;
+    this.quantity = utils.caculateQuantity(this.width, this.density);
+    this.color = options.color || '#cc7065';
+    this.stop = options.stop || false;
     this.ctx = ctx;
     this.id = id;
 }
 
 /**
- * @return {[type]}
+ * init draw the planet.
+ */
+Planet.prototype.initDraw = function (ctx) {
+    this.ctx = ctx;
+};
+
+/**
+ * draw the planet.
  */
 Planet.prototype.draw = function () {
     var circle = new Path2D();
@@ -32,26 +40,23 @@ Planet.prototype.draw = function () {
 };
 
 /**
- * @param  {[type]}
- * @return {[type]}
+ * put in f, and move the planet.
+ * @param  {object} fAll - the object of f, {fX:float, fY:float, fAll:float}.
  */
 Planet.prototype.move = function (fAll) {
-    /* this.show(); */
-    /* console.log(fAll.fX, fAll.fY, '-----',this.id,'--------'); */
+    if (this.stop) return;
     var fX = fAll.fX;
     var fY = fAll.fY;
+
     this.vX = this.vX + (fX * constant.TIME/ this.quantity);
     this.vY = this.vY + (fY * constant.TIME/ this.quantity);
     this.x = this.x + this.vX * constant.TIME;
     this.y = this.y + this.vY * constant.TIME;
+    this.show();
 };
 
-/**
- * @return {[type]}
- */
 Planet.prototype.show = function () {
-    console.log(this.x);
-    console.log(this.y);
-    console.log(this.vX);
-    console.log(this.vY);
+    console.log('id', this.id, '-------');
+    console.log('position', this.x, this.y);
+    console.log('V', this.vX, this.vY);
 };

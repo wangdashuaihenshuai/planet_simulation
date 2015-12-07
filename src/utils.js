@@ -1,17 +1,19 @@
 var constant = require('../constant/constant.js');
 
 /**
- * @param  {[type]}
- * @return {[type]}
+ * caculate the fAll of the F.
+ * @param {object} f - the object of F, {fX:float, fY:float, fAll:float}.
+ * @return {Number} - the fAll of the F.
  */
 function caculateFAll (f) {
     return Math.sqrt( Math.pow(f.fX, 2) + Math.pow(f.fY, 2) );
 }
 
 /**
- * @param  {[type]}
- * @param  {[type]}
- * @return {[type]}
+ * caculate the changed of two f.
+ * @param  {Number} fOld - the old f.
+ * @param  {Number} fNew - the new f.
+ * @return {Number} changed - how much the f changed.
  */
 function caculateFChange (fOld, fNew){
     var changed = (fNew - fOld) / fOld;
@@ -19,17 +21,18 @@ function caculateFChange (fOld, fNew){
 }
 
 /**
- * @param  {[type]}
- * @return {[type]}
+ * caculate the area of the planet.
+ * @param  {Number} width - the width of the planet.
+ * @return {Number} - the area of the planet.
  */
-function caculateQuantity (width) {
-    return constant.PI*Math.pow(width, 2)*constant.DENSITY;
+function caculateQuantity (width, density) {
+    return constant.PI*Math.pow(width, 2)*density;
 }
 
 /**
- * @param  {[type]}
- * @param  {[type]}
- * @return {[type]}
+ * @param  {Object} planet1 - the instance of the Planet.
+ * @param  {Object} planet2 - the instance of the Planet.
+ * @return {object} - two F between two planet.
  */
 function caculateF (planet1, planet2) {
     var distancePow = Math.pow( (planet1.x - planet2.x), 2) + Math.pow( (planet1.y - planet2.y), 2);

@@ -60,19 +60,35 @@
 
 	exports = module.exports = Planet;
 
+	/**
+	 * @param {object} options - the options of planet, {width:float, x:float, y:float, vX:float, vY:float, color:string}.
+	 * @param {object} ctx - the ctx of canvas.
+	 * @param {number} id - id of planet, int.
+	 */
 	function Planet (options, ctx, id) {
 	    this.width = options.width;
 	    this.x = options.x;
 	    this.y = options.y;
 	    this.vX = options.vX;
 	    this.vY = options.vY;
-	    this.quantity = utils.caculateQuantity(this.width);
-	    this.color = options.color || '#000000';
-
+	    this.density = options.density || constant.DENSITY;
+	    this.quantity = utils.caculateQuantity(this.width, this.density);
+	    this.color = options.color || '#cc7065';
+	    this.stop = options.stop || false;
 	    this.ctx = ctx;
 	    this.id = id;
 	}
 
+	/**
+	 * init draw the planet.
+	 */
+	Planet.prototype.initDraw = function (ctx) {
+	    this.ctx = ctx;
+	};
+
+	/**
+	 * draw the planet.
+	 */
 	Planet.prototype.draw = function () {
 	    var circle = new Path2D();
 	    this.ctx.fillStyle = this.color;
@@ -80,22 +96,26 @@
 	    this.ctx.fill(circle);
 	};
 
+	/**
+	 * put in f, and move the planet.
+	 * @param  {object} fAll - the object of f, {fX:float, fY:float, fAll:float}.
+	 */
 	Planet.prototype.move = function (fAll) {
-	    /* this.show(); */
-	    /* console.log(fAll.fX, fAll.fY, '-----',this.id,'--------'); */
+	    if (this.stop) return;
 	    var fX = fAll.fX;
 	    var fY = fAll.fY;
+
 	    this.vX = this.vX + (fX * constant.TIME/ this.quantity);
 	    this.vY = this.vY + (fY * constant.TIME/ this.quantity);
 	    this.x = this.x + this.vX * constant.TIME;
 	    this.y = this.y + this.vY * constant.TIME;
+	    this.show();
 	};
 
 	Planet.prototype.show = function () {
-	    console.log(this.x);
-	    console.log(this.y);
-	    console.log(this.vX);
-	    console.log(this.vY);
+	    console.log('id', this.id, '-------');
+	    console.log('position', this.x, this.y);
+	    console.log('V', this.vX, this.vY);
 	};
 
 
@@ -104,9 +124,9 @@
 /***/ function(module, exports) {
 
 	exports.G = 10;
-	exports.DENSITY = 0.1;
+	exports.DENSITY = 20;
 	exports.PI = 5;
-	exports.TIME = 0.1;
+	exports.TIME = 0.02;
 
 
 /***/ },
@@ -115,19 +135,40 @@
 
 	var constant = __webpack_require__(2);
 
+	/**
+	 * caculate the fAll of the F.
+	 * @param {object} f - the object of F, {fX:float, fY:float, fAll:float}.
+	 * @return {Number} - the fAll of the F.
+	 */
 	function caculateFAll (f) {
 	    return Math.sqrt( Math.pow(f.fX, 2) + Math.pow(f.fY, 2) );
 	}
 
+	/**
+	 * caculate the changed of two f.
+	 * @param  {Number} fOld - the old f.
+	 * @param  {Number} fNew - the new f.
+	 * @return {Number} changed - how much the f changed.
+	 */
 	function caculateFChange (fOld, fNew){
 	    var changed = (fNew - fOld) / fOld;
 	    return changed;
 	}
 
-	function caculateQuantity (width) {
-	    return constant.PI*Math.pow(width, 2)*constant.DENSITY;
+	/**
+	 * caculate the area of the planet.
+	 * @param  {Number} width - the width of the planet.
+	 * @return {Number} - the area of the planet.
+	 */
+	function caculateQuantity (width, density) {
+	    return constant.PI*Math.pow(width, 2)*density;
 	}
 
+	/**
+	 * @param  {Object} planet1 - the instance of the Planet.
+	 * @param  {Object} planet2 - the instance of the Planet.
+	 * @return {object} - two F between two planet.
+	 */
 	function caculateF (planet1, planet2) {
 	    var distancePow = Math.pow( (planet1.x - planet2.x), 2) + Math.pow( (planet1.y - planet2.y), 2);
 
@@ -179,16 +220,22 @@
 
 	module.exports = exports = Universe;
 
-	function Universe(canvasId) {
-	    this.id = canvasId;
+	/**
+	 * the object of universe.
+	 * @constructor
+	 * @param {string} canvas - the id of canvas.
+	 */
+	function Universe() {
 	    this.planetId = 0;
 	    this.planets = [];
 	    this.planetsList = {};
-	    this.canvas = document.getElementById(this.id);
-	    this.ctx = this.canvas.getContext("2d");
-	    this.background = '#ffffff';
+	    this.background = '#3eb1bf';
 	}
 
+	/**
+	 * add a planet in universe.
+	 * @param {object} options - the options of a planet,{width:float, x:float, y:float, vX:float, vY:float, color:string}.
+	 */
 	Universe.prototype.addPlanet = function (options) {
 	    // init planet
 	    var self = this;
@@ -211,47 +258,91 @@
 	    this.planetId ++;
 	};
 
+	/**
+	 *caculate all F in the planets.
+	 */
 	Universe.prototype.caculate = function () {
 	    var self = this;
 	    _.map(this.planets, function (_planet) {
 	        _.map(_planet.matrix.filterPlanetId(), function (planetId) {
 	            self.updatePlanetF(_planet, self.planetsList[planetId]);
 	        });
+	    });
+
+	    _.map(this.planets, function (_planet) {
 	        _planet.matrix.flush();
 	    });
 	};
 
+	/**
+	 * add the f between two planets.
+	 * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+	 * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+	 */
 	Universe.prototype.addPlanetF = function (planet1Info, planet2Info) {
 	    var caculateF = utils.caculateF(planet1Info.planet, planet2Info.planet);
-	    planet1Info.matrix.addF(planet2Info.planet.id, caculateF.f1);
-	    planet2Info.matrix.addF(planet1Info.planet.id, caculateF.f2);
+	    f1Info = {f:caculateF.f1, changed: 1, caculate:true};
+	    f2Info = {f:caculateF.f2, changed: 1, caculate:true};
+	    planet1Info.matrix.addF(planet2Info.planet.id, f1Info);
+	    planet2Info.matrix.addF(planet1Info.planet.id, f2Info);
 	};
 
 
+	/**
+	 * update the f between two planets.
+	 * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+	 * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+	 */
 	Universe.prototype.updatePlanetF = function (planet1Info, planet2Info) {
 	    var caculateF = utils.caculateF(planet1Info.planet, planet2Info.planet);
-	    planet1Info.matrix.updateF(planet2Info.planet.planetId, caculateF.f1);
-	    planet2Info.matrix.updateF(planet1Info.planet.planetId, caculateF.f2);
+	    f1Info = {f:caculateF.f1, changed: 1, caculate:true};
+	    f2Info = {f:caculateF.f2, changed: 1, caculate:true};
+	    planet1Info.matrix.updateF(planet2Info.planet.id, f1Info);
+	    planet2Info.matrix.updateF(planet1Info.planet.id, f2Info);
+
 	};
 
+	/**
+	 * get the AllF in one planet and move it.
+	 */
 	Universe.prototype.move = function () {
 	    _.map(this.planets, function (_planet) {
 	        _planet.planet.move(_planet.matrix.getAllF());
 	    });
 	};
 
+	/**
+	 * init draw contents.
+	 * @param {string} canvasId - the id of <canvas></canvas>.
+	 */
+	Universe.prototype.initDraw = function (canvasId) {
+	    this.id = canvasId;
+	    this.canvas = document.getElementById(this.id);
+	    this.ctx = this.canvas.getContext("2d");
+	};
+
+	/**
+	 * draw all planets.
+	 */
 	Universe.prototype.draw = function () {
 	    _.map(this.planets, function (_planet) {
 	        _planet.planet.draw();
 	    });
 	};
 
+	/**
+	 * clear the canvas.
+	 */
 	Universe.prototype.clear = function () {
 	    this.ctx.fillStyle = this.background;
+	    console.log(this.background);
 	    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 	};
 
+	/**
+	 * run the universe.
+	 */
 	Universe.prototype.run = function () {
 	    var self = this;
 	    self.caculate();
@@ -1827,57 +1918,83 @@
 	var utils = __webpack_require__(3);
 	module.exports = exports = Matrix;
 
+	/**
+	 * init Matrix object
+	 */
 	function Matrix() {
 	    this.matrixF = {};
 	    this.matrixList = [];
 	    this.allF = {fX:0, fY:0, fAll:0};
 	}
 
+	/**
+	 * judge if the planet in the matrix.
+	 * @param  {Int} planetId - the id of planet.
+	 * @return {Boolean} - return if the planet in the matrix.
+	 */
 	Matrix.prototype.isExists = function (planetId) {
 	    return (this.matrixList.indexOf(planetId) == -1) ? false : true;
 	};
 
-	// f = { f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}
-	Matrix.prototype.addF = function (planetId, F) {
+	/**
+	 * @param {Int} planetId - the id of planet.
+	 * @param {Object} fInfo - the object of fInfo,{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}.
+	 */
+	Matrix.prototype.addF = function (planetId, fInfo) {
 	    if (this.isExists(planetId)) return;
 	    this.matrixList.push(planetId);
-	    console.log(F, 'matrix addF');
-	    this.matrixF[planetId] = F;
+	    this.matrixF[planetId] = fInfo;
 	};
 
+	/**
+	 * @param {Int} planetId - the id of planet.
+	 */
 	Matrix.prototype.removeF = function (planetId) {
 	    if (!this.isExists(planetId)) return;
 	    this.matrixList.pop(this.matrixList.indexOf(planetId));
 	    delete this.matrixF[planetId];
 	};
 
-	// F = { f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}
-	Matrix.prototype.updateF = function (planetId, F) {
+	/**
+	 * update the fInfo in the matrix.
+	 * @param {Int} planetId - the id of planet.
+	 * @param {Object} fInfo - the object of fInfo,{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}.
+	 */
+	Matrix.prototype.updateF = function (planetId, fInfo) {
 	    if (!this.isExists(planetId)) return;
-	    var changed = utils.caculateFChange(this.matrixF[planetId].f.fAll, F.f.fAll);
-	    F.changed = changed;
-	    F.caculate = true;
-	    this.matrixF[planetId] = F;
+	    var changed = utils.caculateFChange(this.matrixF[planetId].f.fAll, fInfo.f.fAll);
+	    fInfo.changed = changed;
+	    fInfo.caculate = true;
+	    this.matrixF[planetId] = fInfo;
 	};
 
+	/**
+	 * let all the Finfo.caculate = false.
+	 */
 	Matrix.prototype.flush = function () {
-	    _.map(this.matrixF, function (F, planetId) {
-	        F.caculate = false;
+	    _.map(this.matrixF, function (fInfo, planetId) {
+	        fInfo.caculate = false;
 	    });
 	};
 
+	/**
+	 * @return {Object} fAll - the object of F, {fX:float, fY:float, fAll:float}.
+	 */
 	Matrix.prototype.getAllF = function () {
 	    var self = this;
 	    this.allF = {fX:0, fY:0, fAll:0};
-	    console.log(this.matrixF,"getAllF");
-	    _.map(this.matrixF, function (_f, key){
-	        self.allF.fX = self.allF.fX + _f.fX;
-	        self.allF.fY = self.allF.fY + _f.fY;
+	    _.map(this.matrixF, function (_fInfo, key){
+	        self.allF.fX = self.allF.fX + _fInfo.f.fX;
+	        self.allF.fY = self.allF.fY + _fInfo.f.fY;
 	    });
 	    this.allF.fAll = utils.caculateFAll(this.allF);
-	    return this.allF.fAll;
+	    return this.allF;
 	};
 
+	/**
+	 * filter the planets witch not caculate.
+	 * @return {Arry} filterPlanetId - filter the not caculate planets.
+	 */
 	Matrix.prototype.filterPlanetId = function () {
 	    var filterPlanetId = [];
 	    _.map(this.matrixF, function (F, planetId) {
