@@ -13,8 +13,8 @@ var planet = new Planet({
 
 planet.draw();
 
-// test planet draw and move
-/* console.log(planet.x, planet.y); */
-// planet.move(100, 100);
-// console.log(planet.x, planet.y, planet.quantity);
-/* planet.draw(); */
+//test planet draw and move
+console.log(planet.x, planet.y, planet.quantity);
+planet.move({fX:100, fY:100, FAll: 120});
+console.log(planet.x, planet.y, planet.quantity);
+planet.draw();

@@ -1,18 +1,36 @@
 var constant = require('../constant/constant.js');
 
+/**
+ * @param  {[type]}
+ * @return {[type]}
+ */
 function caculateFAll (f) {
     return Math.sqrt( Math.pow(f.fX, 2) + Math.pow(f.fY, 2) );
 }
 
+/**
+ * @param  {[type]}
+ * @param  {[type]}
+ * @return {[type]}
+ */
 function caculateFChange (fOld, fNew){
     var changed = (fNew - fOld) / fOld;
     return changed;
 }
 
+/**
+ * @param  {[type]}
+ * @return {[type]}
+ */
 function caculateQuantity (width) {
     return constant.PI*Math.pow(width, 2)*constant.DENSITY;
 }
 
+/**
+ * @param  {[type]}
+ * @param  {[type]}
+ * @return {[type]}
+ */
 function caculateF (planet1, planet2) {
     var distancePow = Math.pow( (planet1.x - planet2.x), 2) + Math.pow( (planet1.y - planet2.y), 2);
 

@@ -1,8 +1,8 @@
 module.exports = {
     entry: {
     "main": "./public/index.js",
-    "test_planet": "./test/test_planet/index.js",
-    "test_universe": "./test/test_universe/index.js"
+    "test_planet": "./test/test_planet_draw/test_planet.js",
+    "test_universe": "./test/test_universe_draw/test_universe.js"
     },
     output: {
         path: "./public/build/",

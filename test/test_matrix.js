@@ -1,6 +1,7 @@
 var assert = require('assert');
 var expect = require('chai').expect;
-var Planet = require('../src/planet.js');
+var _ = require('underscore');
+
 var Matrix = require('../src/matrix.js');
 var constant = require('../constant/constant.js');
 
@@ -43,6 +44,7 @@ describe('matrix', function () {
 
                 var f2 = { f: {fX: 5, fY: 12, fAll: 12}, changed: 1, caculate: true};
 
+                console.log(planetId, f2);
                 matrix.updateF(planetId, f2);
                 expect(f2.f).to.deep.equal(matrix.matrixF[planetId].f);
                 assert.equal(1.4, matrix.matrixF[planetId].changed);
@@ -50,7 +52,7 @@ describe('matrix', function () {
         );
     });
 
-    describe('.removeF(planetId, F)', function () {
+    describe('.removeF(planetId)', function () {
         it('remove a F in matrix',
             function () {
                 var matrix = new Matrix();
@@ -64,6 +66,67 @@ describe('matrix', function () {
                 expect({}).to.deep.equal(matrix.matrixF);
 
                 assert.equal(0, matrix.matrixList.length);
+            }
+        );
+    });
+    describe('.flsuh()', function () {
+        it('flush all f caculate to false',
+            function () {
+                var matrix = new Matrix();
+
+                var planetId_1 = 1;
+                var f1 = { f: {fX: 4, fY: 3, fAll: 5}, changed: 1, caculate: true};
+                matrix.addF(planetId_1, f1);
+
+                var planetId_2 = 2;
+                var f2 = { f: {fX: 5, fY: 12, fAll: 13}, changed: 1, caculate: true};
+                matrix.addF(planetId_2, f2);
+
+                _.map(matrix.matrixF, function (F, plantId) {
+                    assert.equal(true, F.caculate);
+                });
+
+                matrix.flush();
+
+                _.map(matrix.matrixF, function (F, plantId) {
+                    assert.equal(false, F.caculate);
+                });
+            }
+        );
+    });
+    describe('.getAllF()', function () {
+        it('get All F in this planet',
+            function () {
+                var matrix = new Matrix();
+
+                var planetId_1 = 1;
+                var f1 = {fX: 2, fY: 3, fAll: 5};
+                matrix.addF(planetId_1, f1);
+
+                var planetId_2 = 2;
+                var f2 = {fX: 3, fY: 9, fAll: 13};
+                matrix.addF(planetId_2, f2);
+
+                assert.equal(13, matrix.getAllF());
+            }
+        );
+    });
+    describe('.filterPlanetId()', function () {
+        it('get All planetId which not caculate',
+            function () {
+                var matrix = new Matrix();
+
+                var planetId_1 = 1;
+                var f1 = { f: {fX: 2, fY: 3, fAll: 5}, changed: 1, caculate: true};
+                matrix.addF(planetId_1, f1);
+
+                var planetId_2 = 2;
+                var f2 = { f: {fX: 3, fY: 9, fAll: 13}, changed: 1, caculate: true};
+                matrix.addF(planetId_2, f2);
+
+                expect([]).to.deep.equal(matrix.filterPlanetId());
+                matrix.flush();
+                expect(['1' ,'2']).to.deep.equal(matrix.filterPlanetId());
             }
         );
     });
