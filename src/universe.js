@@ -15,7 +15,7 @@ function Universe() {
     this.planetId = 0;
     this.planets = [];
     this.planetsList = {};
-    this.background = '#3eb1bf';
+    this.background = '#000000';
 }
 
 /**

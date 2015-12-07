@@ -124,7 +124,7 @@
 /***/ function(module, exports) {
 
 	exports.G = 10;
-	exports.DENSITY = 20;
+	exports.DENSITY = 100;
 	exports.PI = 5;
 	exports.TIME = 0.02;
 
@@ -229,7 +229,7 @@
 	    this.planetId = 0;
 	    this.planets = [];
 	    this.planetsList = {};
-	    this.background = '#3eb1bf';
+	    this.background = '#000000';
 	}
 
 	/**

@@ -55,7 +55,8 @@
 	universe.initDraw('canvas');
 
 
-	var planet_num = 10;
+
+	/* var planet_num = 10; */
 	var getC = function (num) {
 	    var arr = ['a', 'b', 'c' ,'d', 'e', 'f'];
 	    if(num < 10) {
@@ -73,16 +74,33 @@
 	    return color;
 	};
 
-	for (var i=0; i< planet_num; i++) {
-	    var color = getColor();
-	    var rand = Math.random();
-	    var rand2 = Math.random();
-	    var planet = {width: 10,x: 2000*rand2,color:color, y: 1000*rand,vX: 150*rand,vY: 150*(1-rand)};
-	    universe.addPlanet(planet);
-	}
-
-	var planet4 = {width: 60,x: 1000,y: 500,vX: 0,color:'#ff0000',vY: 0,stop:true, density:200};
+	var planet4 = {width: 60,x: 1000,y: 500,vX: 0,color:'#ff0000',vY: 0,stop:true, density:40};
 	universe.addPlanet(planet4);
+
+	var fuckSituation = function () {
+	    var planet_num = 40;
+	    for (var i=0; i< planet_num; i++) {
+	        var color = getColor();
+	        var rand = Math.random();
+	        var rand2 = Math.random();
+	        var planet = {width: 8,x: 2000*rand2,color:color, y: 1000*rand,vX: 150*rand,vY: 150*(1-rand)};
+	        universe.addPlanet(planet);
+	    }
+	};
+
+	var nomalSituation = function () {
+	    var planet0 = {width: 10,x: 1000,color:getColor(), y:900 ,vX:320,vY:0 };
+	    universe.addPlanet(planet0);
+
+	    var planet1 = {width: 10,x: 1000,color:getColor(), y:300 ,vX:-420,vY:0 };
+	    universe.addPlanet(planet1);
+
+	    var planet2 = {width: 10,x: 700,color:getColor(), y:500 ,vX:0,vY:-370 };
+	    universe.addPlanet(planet2);
+	};
+
+
+	fuckSituation();
 
 	universe.clear();
 
@@ -165,7 +183,7 @@
 /***/ function(module, exports) {
 
 	exports.G = 10;
-	exports.DENSITY = 20;
+	exports.DENSITY = 100;
 	exports.PI = 5;
 	exports.TIME = 0.02;
 
@@ -270,7 +288,7 @@
 	    this.planetId = 0;
 	    this.planets = [];
 	    this.planetsList = {};
-	    this.background = '#3eb1bf';
+	    this.background = '#000000';
 	}
 
 	/**
