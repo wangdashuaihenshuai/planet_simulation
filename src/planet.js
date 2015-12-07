@@ -1,5 +1,6 @@
 var constant = require('../constant/constant.js');
 var utils = require('./utils.js');
+var _ = require('underscore');
 
 exports = module.exports = Planet;
 
@@ -20,6 +21,8 @@ function Planet (options, ctx, id) {
     this.stop = options.stop || false;
     this.ctx = ctx;
     this.id = id;
+    this.locus = [{x:this.x, y:this.y}];
+    this.locusLen = 500;
 }
 
 /**
@@ -33,6 +36,7 @@ Planet.prototype.initDraw = function (ctx) {
  * draw the planet.
  */
 Planet.prototype.draw = function () {
+    this.drawLocus();
     var circle = new Path2D();
     this.ctx.fillStyle = this.color;
     circle.arc(this.x, this.y, this.width, 0, 2 * Math.PI);
@@ -52,7 +56,30 @@ Planet.prototype.move = function (fAll) {
     this.vY = this.vY + (fY * constant.TIME/ this.quantity);
     this.x = this.x + this.vX * constant.TIME;
     this.y = this.y + this.vY * constant.TIME;
+    this.addLocus(this.x, this.y);
     this.show();
+};
+
+Planet.prototype.addLocus = function (x, y) {
+    var position = {x:x, y:y};
+
+    if (this.locus.length > this.locusLen) {
+        this.locus.shift(position);
+        this.locus.push(position);
+    }else{
+        this.locus.push(position);
+    }
+};
+
+Planet.prototype.drawLocus = function (x, y) {
+    var self = this;
+    this.ctx.strokeStyle = this.color;
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.locus[0].x,this.locus[0].y);
+    _.map(this.locus, function (position) {
+        self.ctx.lineTo(position.x, position.y);
+    });
+    this.ctx.stroke();
 };
 
 Planet.prototype.show = function () {
