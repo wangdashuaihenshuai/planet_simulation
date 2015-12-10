@@ -92,8 +92,17 @@ Universe.prototype.updatePlanetF = function (planet1Info, planet2Info) {
  * get the AllF in one planet and move it.
  */
 Universe.prototype.move = function () {
+    var self = this;
     _.map(this.planets, function (_planet) {
         _planet.planet.move(_planet.matrix.getAllF());
+
+        /* if (_planet.planet.x > self.canvasWidth || _planet.planet.x < 0) { */
+            // _planet.planet.vX =  - _planet.planet.vX;
+        // }
+        // if (_planet.planet.y > self.canvasHeight || _planet.planet.y < 0) {
+            // _planet.planet.vY =  - _planet.planet.vY;
+        /* } */
+
     });
 };
 
@@ -101,7 +110,9 @@ Universe.prototype.move = function () {
  * init draw contents.
  * @param {string} canvasId - the id of <canvas></canvas>.
  */
-Universe.prototype.initDraw = function (canvasId) {
+Universe.prototype.initDraw = function (canvasId, canvasWidth, canvasHeight) {
+    this.canvasWidth = canvasWidth;
+    this.canvasHeight = canvasHeight;
     this.id = canvasId;
     this.canvas = document.getElementById(this.id);
     this.ctx = this.canvas.getContext("2d");

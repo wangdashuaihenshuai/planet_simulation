@@ -6,10 +6,13 @@ var constant = require('../../constant/constant.js');
 var canvasId = 'canvas';
 var universe = new Universe(canvasId);
 
-universe.initDraw('canvas');
+var planet_num = 20;
+var canvasWidth = 2400;
+var canvasHeight = 1200;
+
+universe.initDraw('canvas', canvasWidth, canvasHeight);
 
 
-var planet_num = 10;
 var getC = function (num) {
     var arr = ['a', 'b', 'c' ,'d', 'e', 'f'];
     if(num < 10) {
@@ -29,13 +32,14 @@ var getColor = function () {
 
 for (var i=0; i< planet_num; i++) {
     var color = getColor();
+    var backColor = getColor();
     var rand = Math.random();
     var rand2 = Math.random();
-    var planet = {width: 10,x: 2000*rand2,color:color, y: 1000*rand,vX: 150*rand,vY: 150*(1-rand)};
+    var planet = {width: 1 + 10*rand,x: canvasWidth*rand2,color:color,backColor:backColor, y: canvasHeight*rand,vX: 50*rand,vY: 50*(1-rand)};
     universe.addPlanet(planet);
 }
 
-var planet4 = {width: 60,x: 1000,y: 500,vX: 0,color:'#ff0000',vY: 0,stop:true, density:200};
+var planet4 = {width: 50,x: canvasWidth/2,y: canvasHeight/2,vX: 0,color:'#ff0000',vY: 0,stop:true, density:8};
 universe.addPlanet(planet4);
 
 universe.clear();

@@ -74,6 +74,7 @@
 	    this.density = options.density || constant.DENSITY;
 	    this.quantity = utils.caculateQuantity(this.width, this.density);
 	    this.color = options.color || '#cc7065';
+	    this.backColor = options.backColor || '#cc7065';
 	    this.stop = options.stop || false;
 	    this.ctx = ctx;
 	    this.id = id;
@@ -92,8 +93,23 @@
 	Planet.prototype.draw = function () {
 	    var circle = new Path2D();
 	    this.ctx.fillStyle = this.color;
-	    circle.arc(this.x, this.y, this.width, 0, 2 * Math.PI);
+	    circle.arc(this.x, this.y, this.width*9/6, 0, 2 * Math.PI);
 	    this.ctx.fill(circle);
+
+	    var circle2 = new Path2D();
+	    this.ctx.fillStyle = '#3eb1bf';
+	    circle2.arc(this.x, this.y, this.width*8/6, 0, 2 * Math.PI);
+	    this.ctx.fill(circle2);
+
+	    var rGrd = this.ctx.createRadialGradient(this.x, this.y, 0,   this.x, this.y, this.width*1.5);
+	    rGrd.addColorStop(0, this.color);
+	    rGrd.addColorStop(1, this.backColor);
+	    this.ctx.fillStyle = rGrd;
+
+	    this.ctx.beginPath();
+	    this.ctx.arc(this.x,this.y,this.width,0,Math.PI*2,true);
+	    this.ctx.closePath();
+	    this.ctx.fill();
 	};
 
 	/**
@@ -109,7 +125,6 @@
 	    this.vY = this.vY + (fY * constant.TIME/ this.quantity);
 	    this.x = this.x + this.vX * constant.TIME;
 	    this.y = this.y + this.vY * constant.TIME;
-	    this.show();
 	};
 
 	Planet.prototype.show = function () {
@@ -123,10 +138,11 @@
 /* 2 */
 /***/ function(module, exports) {
 
-	exports.G = 10;
-	exports.DENSITY = 20;
+	exports.G = 8;
+	exports.DENSITY = 3;
 	exports.PI = 5;
-	exports.TIME = 0.02;
+	exports.TIME = 0.1;
+	exports.scale = 1;
 
 
 /***/ },
@@ -181,16 +197,25 @@
 
 	    var distance = Math.sqrt(distancePow);
 
+	    var trueDistance = distance;
 	    if (distance <= (planet1.width + planet2.width)) {
 	        distance = planet1.width + planet2.width;
 	        distancePow = Math.pow(distance, 2);
 	    }
 
 	    var f = constant.G * planet1.quantity * planet2.quantity / distancePow;
-	    f1x = (planet2.x - planet1.x) * f / distance;
-	    f2x = (planet1.x - planet2.x) * f / distance;
-	    f1y = (planet2.y - planet1.y) * f / distance;
-	    f2y = (planet1.y - planet2.y) * f / distance;
+	    f1x = (planet2.x - planet1.x) * f / (distance * Math.pow(constant.scale, 2));
+	    f2x = (planet1.x - planet2.x) * f / (distance * Math.pow(constant.scale, 2));
+	    f1y = (planet2.y - planet1.y) * f / (distance * Math.pow(constant.scale, 2));
+	    f2y = (planet1.y - planet2.y) * f / (distance * Math.pow(constant.scale, 2));
+
+	    if (distance <= (planet1.width + planet2.width)) {
+	        var bDistance = trueDistance / (planet1.width + planet2.width);
+	        return {
+	            f1:{fX: f1x*bDistance, fY:f1y*bDistance, fAll:f*bDistance},
+	            f2:{fX: f1x*bDistance, fY:f1y*bDistance, fAll:f*bDistance},
+	        };
+	    }
 
 	    return {
 	        f1:{fX: f1x, fY:f1y, fAll:f},
@@ -306,8 +331,17 @@
 	 * get the AllF in one planet and move it.
 	 */
 	Universe.prototype.move = function () {
+	    var self = this;
 	    _.map(this.planets, function (_planet) {
 	        _planet.planet.move(_planet.matrix.getAllF());
+
+	        /* if (_planet.planet.x > self.canvasWidth || _planet.planet.x < 0) { */
+	            // _planet.planet.vX =  - _planet.planet.vX;
+	        // }
+	        // if (_planet.planet.y > self.canvasHeight || _planet.planet.y < 0) {
+	            // _planet.planet.vY =  - _planet.planet.vY;
+	        /* } */
+
 	    });
 	};
 
@@ -315,7 +349,9 @@
 	 * init draw contents.
 	 * @param {string} canvasId - the id of <canvas></canvas>.
 	 */
-	Universe.prototype.initDraw = function (canvasId) {
+	Universe.prototype.initDraw = function (canvasId, canvasWidth, canvasHeight) {
+	    this.canvasWidth = canvasWidth;
+	    this.canvasHeight = canvasHeight;
 	    this.id = canvasId;
 	    this.canvas = document.getElementById(this.id);
 	    this.ctx = this.canvas.getContext("2d");

@@ -18,3 +18,15 @@ console.log(planet.x, planet.y, planet.quantity);
 planet.move({fX:100, fY:100, FAll: 120});
 console.log(planet.x, planet.y, planet.quantity);
 planet.draw();
+
+
+
+var rGrd =ctx.createRadialGradient(450, 150, 30,   450, 150, 150);
+rGrd.addColorStop(0, '#00ff00');
+rGrd.addColorStop(1, '#ff0000');
+ctx.fillStyle = rGrd;
+
+ctx.beginPath();
+ctx.arc(450,150,300,0,Math.PI*2,true);
+ctx.closePath();
+ctx.fill();

@@ -17,7 +17,7 @@ function Planet (options, ctx, id) {
     this.density = options.density || constant.DENSITY;
     this.quantity = utils.caculateQuantity(this.width, this.density);
     this.color = options.color || '#cc7065';
-    this.backColor = options.backColor || '#cc7065';
+    this.color = options.backColor || '#cc7065';
     this.stop = options.stop || false;
     this.ctx = ctx;
     this.id = id;
@@ -34,17 +34,12 @@ Planet.prototype.initDraw = function (ctx) {
  * draw the planet.
  */
 Planet.prototype.draw = function () {
-    var circle = new Path2D();
-    this.ctx.fillStyle = this.color;
-    circle.arc(this.x, this.y, this.width*9/6, 0, 2 * Math.PI);
-    this.ctx.fill(circle);
+    /* var circle = new Path2D(); */
+    // this.ctx.fillStyle = this.color;
+    // circle.arc(this.x, this.y, this.width, 0, 2 * Math.PI);
+    /* this.ctx.fill(circle); */
 
-    var circle2 = new Path2D();
-    this.ctx.fillStyle = '#3eb1bf';
-    circle2.arc(this.x, this.y, this.width*8/6, 0, 2 * Math.PI);
-    this.ctx.fill(circle2);
-
-    var rGrd = this.ctx.createRadialGradient(this.x, this.y, 0,   this.x, this.y, this.width*1.5);
+    var rGrd = this.ctx.createRadialGradient(this.x, this.y, 0,   this.x, this.y, this.width);
     rGrd.addColorStop(0, this.color);
     rGrd.addColorStop(1, this.backColor);
     this.ctx.fillStyle = rGrd;

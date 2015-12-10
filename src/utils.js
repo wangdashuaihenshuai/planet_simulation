@@ -46,16 +46,25 @@ function caculateF (planet1, planet2) {
 
     var distance = Math.sqrt(distancePow);
 
+    var trueDistance = distance;
     if (distance <= (planet1.width + planet2.width)) {
         distance = planet1.width + planet2.width;
         distancePow = Math.pow(distance, 2);
     }
 
     var f = constant.G * planet1.quantity * planet2.quantity / distancePow;
-    f1x = (planet2.x - planet1.x) * f / distance;
-    f2x = (planet1.x - planet2.x) * f / distance;
-    f1y = (planet2.y - planet1.y) * f / distance;
-    f2y = (planet1.y - planet2.y) * f / distance;
+    f1x = (planet2.x - planet1.x) * f / (distance * Math.pow(constant.scale, 2));
+    f2x = (planet1.x - planet2.x) * f / (distance * Math.pow(constant.scale, 2));
+    f1y = (planet2.y - planet1.y) * f / (distance * Math.pow(constant.scale, 2));
+    f2y = (planet1.y - planet2.y) * f / (distance * Math.pow(constant.scale, 2));
+
+    if (distance <= (planet1.width + planet2.width)) {
+        var bDistance = trueDistance / (planet1.width + planet2.width);
+        return {
+            f1:{fX: f1x*bDistance, fY:f1y*bDistance, fAll:f*bDistance},
+            f2:{fX: f1x*bDistance, fY:f1y*bDistance, fAll:f*bDistance},
+        };
+    }
 
     return {
         f1:{fX: f1x, fY:f1y, fAll:f},
