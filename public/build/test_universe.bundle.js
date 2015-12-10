@@ -59,6 +59,8 @@
 	universe.initDraw('canvas', canvasWidth, canvasHeight);
 
 
+	var planet_num = 10;
+
 	var getC = function (num) {
 	    var arr = ['a', 'b', 'c' ,'d', 'e', 'f'];
 	    if(num < 10) {
@@ -88,6 +90,31 @@
 	var planet4 = {width: 50,x: canvasWidth/2,y: canvasHeight/2,vX: 0,color:'#ff0000',vY: 0,stop:true, density:8};
 	universe.addPlanet(planet4);
 
+	var fuckSituation = function () {
+	    var planet_num = 40;
+	    for (var i=0; i< planet_num; i++) {
+	        var color = getColor();
+	        var rand = Math.random();
+	        var rand2 = Math.random();
+	        var planet = {width: 8,x: 2000*rand2,color:color, y: 1000*rand,vX: 150*rand,vY: 150*(1-rand)};
+	        universe.addPlanet(planet);
+	    }
+	};
+
+	var nomalSituation = function () {
+	    var planet0 = {width: 10,x: 1000,color:getColor(), y:900 ,vX:320,vY:0 };
+	    universe.addPlanet(planet0);
+
+	    var planet1 = {width: 10,x: 1000,color:getColor(), y:300 ,vX:-420,vY:0 };
+	    universe.addPlanet(planet1);
+
+	    var planet2 = {width: 10,x: 700,color:getColor(), y:500 ,vX:0,vY:-370 };
+	    universe.addPlanet(planet2);
+	};
+
+
+	fuckSituation();
+
 	universe.clear();
 
 	window.requestAnimationFrame(function () {
@@ -102,6 +129,7 @@
 
 	var constant = __webpack_require__(2);
 	var utils = __webpack_require__(3);
+	var _ = __webpack_require__(5);
 
 	exports = module.exports = Planet;
 
@@ -123,6 +151,8 @@
 	    this.stop = options.stop || false;
 	    this.ctx = ctx;
 	    this.id = id;
+	    this.locus = [{x:this.x, y:this.y}];
+	    this.locusLen = 500;
 	}
 
 	/**
@@ -136,6 +166,7 @@
 	 * draw the planet.
 	 */
 	Planet.prototype.draw = function () {
+	    this.drawLocus();
 	    var circle = new Path2D();
 	    this.ctx.fillStyle = this.color;
 	    circle.arc(this.x, this.y, this.width*9/6, 0, 2 * Math.PI);
@@ -170,6 +201,28 @@
 	    this.vY = this.vY + (fY * constant.TIME/ this.quantity);
 	    this.x = this.x + this.vX * constant.TIME;
 	    this.y = this.y + this.vY * constant.TIME;
+	};
+
+	Planet.prototype.addLocus = function (x, y) {
+	    var position = {x:x, y:y};
+
+	    if (this.locus.length > this.locusLen) {
+	        this.locus.shift(position);
+	        this.locus.push(position);
+	    }else{
+	        this.locus.push(position);
+	    }
+	};
+
+	Planet.prototype.drawLocus = function (x, y) {
+	    var self = this;
+	    this.ctx.strokeStyle = this.color;
+	    this.ctx.beginPath();
+	    this.ctx.moveTo(this.locus[0].x,this.locus[0].y);
+	    _.map(this.locus, function (position) {
+	        self.ctx.lineTo(position.x, position.y);
+	    });
+	    this.ctx.stroke();
 	};
 
 	Planet.prototype.show = function () {
@@ -299,7 +352,7 @@
 	    this.planetId = 0;
 	    this.planets = [];
 	    this.planetsList = {};
-	    this.background = '#3eb1bf';
+	    this.background = '#000000';
 	}
 
 	/**
