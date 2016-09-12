@@ -1,7 +1,7 @@
 
-var Planet = require('../../src/planet.js');
-var Universe = require('../../src/universe.js');
-var constant = require('../../constant/constant.js');
+var Planet = require('./planet.js');
+var Universe = require('./universe.js');
+var constant = require('../constant/constant.js');
 
 var canvasId = 'canvas';
 var universe = new Universe(canvasId);
@@ -74,4 +74,3 @@ universe.clear();
 window.requestAnimationFrame(function () {
     universe.run();
 });
-

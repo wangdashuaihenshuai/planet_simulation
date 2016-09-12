@@ -44,38 +44,82 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
+	
 	var Planet = __webpack_require__(1);
+	var Universe = __webpack_require__(5);
+	var constant = __webpack_require__(2);
 
-	var ctx = document.getElementById("canvas").getContext("2d");
+	var canvasId = 'canvas';
+	var universe = new Universe(canvasId);
 
-	var planet = new Planet({
-	    width: 20,
-	    x: 50,
-	    y: 50,
-	    vX: 10,
-	    vY: 10,
-	    color: '#00ff00'
-	}, ctx, 1);
+	var planet_num = 20;
+	var canvasWidth = 2400;
+	var canvasHeight = 1200;
 
-	planet.draw();
-
-	//test planet draw and move
-	console.log(planet.x, planet.y, planet.quantity);
-	planet.move({fX:100, fY:100, FAll: 120});
-	console.log(planet.x, planet.y, planet.quantity);
-	planet.draw();
+	universe.initDraw('canvas', canvasWidth, canvasHeight);
 
 
+	var planet_num = 10;
 
-	var rGrd =ctx.createRadialGradient(450, 150, 30,   450, 150, 150);
-	rGrd.addColorStop(0, '#00ff00');
-	rGrd.addColorStop(1, '#ff0000');
-	ctx.fillStyle = rGrd;
+	var getC = function (num) {
+	    var arr = ['a', 'b', 'c' ,'d', 'e', 'f'];
+	    if(num < 10) {
+	        return num;
+	    }else{
+	        return arr[num - 10];
+	    }
+	};
 
-	ctx.beginPath();
-	ctx.arc(450,150,300,0,Math.PI*2,true);
-	ctx.closePath();
-	ctx.fill();
+	var getColor = function () {
+	    var color = '#';
+	    for (var i = 0;i < 6;i ++) {
+	        color = color + String (getC(parseInt (Math.random()*16)));
+	    }
+	    return color;
+	};
+
+	for (var i=0; i< planet_num; i++) {
+	    var color = getColor();
+	    var backColor = getColor();
+	    var rand = Math.random();
+	    var rand2 = Math.random();
+	    var planet = {width: 1 + 10*rand,x: canvasWidth*rand2,color:color,backColor:backColor, y: canvasHeight*rand,vX: 50*rand,vY: 50*(1-rand)};
+	    universe.addPlanet(planet);
+	}
+
+	var planet4 = {width: 50,x: canvasWidth/2,y: canvasHeight/2,vX: 0,color:'#ff0000',vY: 0,stop:true, density:8};
+	universe.addPlanet(planet4);
+
+	var fuckSituation = function () {
+	    var planet_num = 40;
+	    for (var i=0; i< planet_num; i++) {
+	        var color = getColor();
+	        var rand = Math.random();
+	        var rand2 = Math.random();
+	        var planet = {width: 8,x: 2000*rand2,color:color, y: 1000*rand,vX: 150*rand,vY: 150*(1-rand)};
+	        universe.addPlanet(planet);
+	    }
+	};
+
+	var nomalSituation = function () {
+	    var planet0 = {width: 10,x: 1000,color:getColor(), y:900 ,vX:320,vY:0 };
+	    universe.addPlanet(planet0);
+
+	    var planet1 = {width: 10,x: 1000,color:getColor(), y:300 ,vX:-420,vY:0 };
+	    universe.addPlanet(planet1);
+
+	    var planet2 = {width: 10,x: 700,color:getColor(), y:500 ,vX:0,vY:-370 };
+	    universe.addPlanet(planet2);
+	};
+
+
+	fuckSituation();
+
+	universe.clear();
+
+	window.requestAnimationFrame(function () {
+	    universe.run();
+	});
 
 
 /***/ },
@@ -84,7 +128,7 @@
 
 	var constant = __webpack_require__(2);
 	var utils = __webpack_require__(3);
-	var _ = __webpack_require__(5);
+	var _ = __webpack_require__(4);
 
 	exports = module.exports = Planet;
 
@@ -287,8 +331,7 @@
 
 
 /***/ },
-/* 4 */,
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
@@ -1839,6 +1882,259 @@
 	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	  }
 	}.call(this));
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var constant = __webpack_require__(2);
+	var _ = __webpack_require__(4);
+	var Planet = __webpack_require__(1);
+	var Matrix = __webpack_require__(6);
+	var utils = __webpack_require__(3);
+
+	module.exports = exports = Universe;
+
+	/**
+	 * the object of universe.
+	 * @constructor
+	 * @param {string} canvas - the id of canvas.
+	 */
+	function Universe() {
+	    this.planetId = 0;
+	    this.planets = [];
+	    this.planetsList = {};
+	    this.background = '#000000';
+	}
+
+	/**
+	 * add a planet in universe.
+	 * @param {object} options - the options of a planet,{width:float, x:float, y:float, vX:float, vY:float, color:string}.
+	 */
+	Universe.prototype.addPlanet = function (options) {
+	    // init planet
+	    var self = this;
+	    var planet = new Planet(options, this.ctx, this.planetId);
+	    var matrix = new Matrix();
+	    var planetInfo = {
+	        planet:planet,
+	        matrix: matrix
+	    };
+	    this.planets.push(planetInfo);
+	    this.planetsList[this.planetId] = planetInfo;
+
+	    // add planet influence
+	    _.map(this.planets, function (_planet) {
+	        if (_planet.planet.id != self.planetId) {
+	            self.addPlanetF(planetInfo, _planet);
+	        }
+	    });
+
+	    this.planetId ++;
+	};
+
+	/**
+	 *caculate all F in the planets.
+	 */
+	Universe.prototype.caculate = function () {
+	    var self = this;
+	    _.map(this.planets, function (_planet) {
+	        _.map(_planet.matrix.filterPlanetId(), function (planetId) {
+	            self.updatePlanetF(_planet, self.planetsList[planetId]);
+	        });
+	    });
+
+	    _.map(this.planets, function (_planet) {
+	        _planet.matrix.flush();
+	    });
+	};
+
+	/**
+	 * add the f between two planets.
+	 * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+	 * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+	 */
+	Universe.prototype.addPlanetF = function (planet1Info, planet2Info) {
+	    var caculateF = utils.caculateF(planet1Info.planet, planet2Info.planet);
+	    f1Info = {f:caculateF.f1, changed: 1, caculate:true};
+	    f2Info = {f:caculateF.f2, changed: 1, caculate:true};
+	    planet1Info.matrix.addF(planet2Info.planet.id, f1Info);
+	    planet2Info.matrix.addF(planet1Info.planet.id, f2Info);
+	};
+
+
+	/**
+	 * update the f between two planets.
+	 * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+	 * @param {Object} planet1Info - the planetInfo instance, { planet:planet, matrix: matrix }.
+	 */
+	Universe.prototype.updatePlanetF = function (planet1Info, planet2Info) {
+	    var caculateF = utils.caculateF(planet1Info.planet, planet2Info.planet);
+	    f1Info = {f:caculateF.f1, changed: 1, caculate:true};
+	    f2Info = {f:caculateF.f2, changed: 1, caculate:true};
+	    planet1Info.matrix.updateF(planet2Info.planet.id, f1Info);
+	    planet2Info.matrix.updateF(planet1Info.planet.id, f2Info);
+
+	};
+
+	/**
+	 * get the AllF in one planet and move it.
+	 */
+	Universe.prototype.move = function () {
+	    var self = this;
+	    _.map(this.planets, function (_planet) {
+	        _planet.planet.move(_planet.matrix.getAllF());
+
+	        /* if (_planet.planet.x > self.canvasWidth || _planet.planet.x < 0) { */
+	            // _planet.planet.vX =  - _planet.planet.vX;
+	        // }
+	        // if (_planet.planet.y > self.canvasHeight || _planet.planet.y < 0) {
+	            // _planet.planet.vY =  - _planet.planet.vY;
+	        /* } */
+
+	    });
+	};
+
+	/**
+	 * init draw contents.
+	 * @param {string} canvasId - the id of <canvas></canvas>.
+	 */
+	Universe.prototype.initDraw = function (canvasId, canvasWidth, canvasHeight) {
+	    this.canvasWidth = canvasWidth;
+	    this.canvasHeight = canvasHeight;
+	    this.id = canvasId;
+	    this.canvas = document.getElementById(this.id);
+	    this.ctx = this.canvas.getContext("2d");
+	};
+
+	/**
+	 * draw all planets.
+	 */
+	Universe.prototype.draw = function () {
+	    _.map(this.planets, function (_planet) {
+	        _planet.planet.draw();
+	    });
+	};
+
+	/**
+	 * clear the canvas.
+	 */
+	Universe.prototype.clear = function () {
+	    this.ctx.fillStyle = this.background;
+	    console.log(this.background);
+	    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+	};
+
+	/**
+	 * run the universe.
+	 */
+	Universe.prototype.run = function () {
+	    var self = this;
+	    self.caculate();
+	    self.move();
+	    self.clear();
+	    self.draw();
+	    window.requestAnimationFrame(function () {
+	        self.run();
+	    });
+	};
+
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _ = __webpack_require__(4);
+	var utils = __webpack_require__(3);
+	module.exports = exports = Matrix;
+
+	/**
+	 * init Matrix object
+	 */
+	function Matrix() {
+	    this.matrixF = {};
+	    this.matrixList = [];
+	    this.allF = {fX:0, fY:0, fAll:0};
+	}
+
+	/**
+	 * judge if the planet in the matrix.
+	 * @param  {Int} planetId - the id of planet.
+	 * @return {Boolean} - return if the planet in the matrix.
+	 */
+	Matrix.prototype.isExists = function (planetId) {
+	    return (this.matrixList.indexOf(planetId) == -1) ? false : true;
+	};
+
+	/**
+	 * @param {Int} planetId - the id of planet.
+	 * @param {Object} fInfo - the object of fInfo,{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}.
+	 */
+	Matrix.prototype.addF = function (planetId, fInfo) {
+	    if (this.isExists(planetId)) return;
+	    this.matrixList.push(planetId);
+	    this.matrixF[planetId] = fInfo;
+	};
+
+	/**
+	 * @param {Int} planetId - the id of planet.
+	 */
+	Matrix.prototype.removeF = function (planetId) {
+	    if (!this.isExists(planetId)) return;
+	    this.matrixList.pop(this.matrixList.indexOf(planetId));
+	    delete this.matrixF[planetId];
+	};
+
+	/**
+	 * update the fInfo in the matrix.
+	 * @param {Int} planetId - the id of planet.
+	 * @param {Object} fInfo - the object of fInfo,{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}{ f: {fX:float, fY:float, fAll:float}, changed: int (defalt 1), caculate: true}.
+	 */
+	Matrix.prototype.updateF = function (planetId, fInfo) {
+	    if (!this.isExists(planetId)) return;
+	    var changed = utils.caculateFChange(this.matrixF[planetId].f.fAll, fInfo.f.fAll);
+	    fInfo.changed = changed;
+	    fInfo.caculate = true;
+	    this.matrixF[planetId] = fInfo;
+	};
+
+	/**
+	 * let all the Finfo.caculate = false.
+	 */
+	Matrix.prototype.flush = function () {
+	    _.map(this.matrixF, function (fInfo, planetId) {
+	        fInfo.caculate = false;
+	    });
+	};
+
+	/**
+	 * @return {Object} fAll - the object of F, {fX:float, fY:float, fAll:float}.
+	 */
+	Matrix.prototype.getAllF = function () {
+	    var self = this;
+	    this.allF = {fX:0, fY:0, fAll:0};
+	    _.map(this.matrixF, function (_fInfo, key){
+	        self.allF.fX = self.allF.fX + _fInfo.f.fX;
+	        self.allF.fY = self.allF.fY + _fInfo.f.fY;
+	    });
+	    this.allF.fAll = utils.caculateFAll(this.allF);
+	    return this.allF;
+	};
+
+	/**
+	 * filter the planets witch not caculate.
+	 * @return {Arry} filterPlanetId - filter the not caculate planets.
+	 */
+	Matrix.prototype.filterPlanetId = function () {
+	    var filterPlanetId = [];
+	    _.map(this.matrixF, function (F, planetId) {
+	        if (!F.caculate) filterPlanetId.push(planetId);
+	    });
+	    return filterPlanetId;
+	};
 
 
 /***/ }
