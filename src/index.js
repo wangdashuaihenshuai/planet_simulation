@@ -7,8 +7,8 @@ var canvasId = 'canvas';
 var universe = new Universe(canvasId);
 
 var planet_num = 20;
-var canvasWidth = 2400;
-var canvasHeight = 1200;
+var canvasWidth = 1920;
+var canvasHeight = 1080;
 
 universe.initDraw('canvas', canvasWidth, canvasHeight);
 
@@ -44,8 +44,8 @@ for (var i=0; i< planet_num; i++) {
 var planet4 = {width: 50,x: canvasWidth/2,y: canvasHeight/2,vX: 0,color:'#ff0000',vY: 0,stop:true, density:8};
 universe.addPlanet(planet4);
 
-var fuckSituation = function () {
-    var planet_num = 40;
+var randomSituation = function () {
+    var planet_num = 20;
     for (var i=0; i< planet_num; i++) {
         var color = getColor();
         var rand = Math.random();
@@ -67,7 +67,7 @@ var nomalSituation = function () {
 };
 
 
-fuckSituation();
+randomSituation();
 
 universe.clear();
 

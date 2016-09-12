@@ -37,17 +37,6 @@ Planet.prototype.initDraw = function (ctx) {
  * draw the planet.
  */
 Planet.prototype.draw = function () {
-    this.drawLocus();
-    var circle = new Path2D();
-    this.ctx.fillStyle = this.color;
-    circle.arc(this.x, this.y, this.width*9/6, 0, 2 * Math.PI);
-    this.ctx.fill(circle);
-
-    var circle2 = new Path2D();
-    this.ctx.fillStyle = '#3eb1bf';
-    circle2.arc(this.x, this.y, this.width*8/6, 0, 2 * Math.PI);
-    this.ctx.fill(circle2);
-
     var rGrd = this.ctx.createRadialGradient(this.x, this.y, 0,   this.x, this.y, this.width*1.5);
     rGrd.addColorStop(0, this.color);
     rGrd.addColorStop(1, this.backColor);

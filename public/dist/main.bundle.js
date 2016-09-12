@@ -53,8 +53,8 @@
 	var universe = new Universe(canvasId);
 
 	var planet_num = 20;
-	var canvasWidth = 2400;
-	var canvasHeight = 1200;
+	var canvasWidth = 1920;
+	var canvasHeight = 1080;
 
 	universe.initDraw('canvas', canvasWidth, canvasHeight);
 
@@ -90,8 +90,8 @@
 	var planet4 = {width: 50,x: canvasWidth/2,y: canvasHeight/2,vX: 0,color:'#ff0000',vY: 0,stop:true, density:8};
 	universe.addPlanet(planet4);
 
-	var fuckSituation = function () {
-	    var planet_num = 40;
+	var randomSituation = function () {
+	    var planet_num = 20;
 	    for (var i=0; i< planet_num; i++) {
 	        var color = getColor();
 	        var rand = Math.random();
@@ -113,7 +113,7 @@
 	};
 
 
-	fuckSituation();
+	randomSituation();
 
 	universe.clear();
 
@@ -165,17 +165,6 @@
 	 * draw the planet.
 	 */
 	Planet.prototype.draw = function () {
-	    this.drawLocus();
-	    var circle = new Path2D();
-	    this.ctx.fillStyle = this.color;
-	    circle.arc(this.x, this.y, this.width*9/6, 0, 2 * Math.PI);
-	    this.ctx.fill(circle);
-
-	    var circle2 = new Path2D();
-	    this.ctx.fillStyle = '#3eb1bf';
-	    circle2.arc(this.x, this.y, this.width*8/6, 0, 2 * Math.PI);
-	    this.ctx.fill(circle2);
-
 	    var rGrd = this.ctx.createRadialGradient(this.x, this.y, 0,   this.x, this.y, this.width*1.5);
 	    rGrd.addColorStop(0, this.color);
 	    rGrd.addColorStop(1, this.backColor);
