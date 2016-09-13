@@ -132,7 +132,6 @@ Universe.prototype.draw = function () {
  */
 Universe.prototype.clear = function () {
     this.ctx.fillStyle = this.background;
-    console.log(this.background);
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 };
@@ -150,4 +149,3 @@ Universe.prototype.run = function () {
         self.run();
     });
 };
-

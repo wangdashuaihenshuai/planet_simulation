@@ -59,7 +59,7 @@
 	universe.initDraw('canvas', canvasWidth, canvasHeight);
 
 
-	var planet_num = 10;
+	var planet_num = 30;
 
 	var getC = function (num) {
 	    var arr = ['a', 'b', 'c' ,'d', 'e', 'f'];
@@ -78,17 +78,35 @@
 	    return color;
 	};
 
+	var plantEnergy = 900;
+	var getV = function (cW, cH, _width, x2, y2, E) {
+	    var x1 = cW/2;
+	    var y1 = cH/2;
+	    var length = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+	    var vMax = E / Math.sqrt(length);
+	    var vX = vMax * (y2 - y1) / length;
+	    var vY = vMax * (x2 - x1) / length;
+	    return {
+	        vX: vX,
+	        vY: vY,
+	    }
+	}
+
 	for (var i=0; i< planet_num; i++) {
 	    var color = getColor();
 	    var backColor = getColor();
 	    var rand = Math.random();
 	    var rand2 = Math.random();
-	    var planet = {width: 1 + 10*rand,x: canvasWidth*rand2,color:color,backColor:backColor, y: canvasHeight*rand,vX: 50*rand,vY: 50*(1-rand)};
+	    var _width = 1 + 10*rand
+	    var pX = canvasWidth*rand2
+	    var pY = canvasHeight*rand
+	    var v = getV(canvasWidth, canvasHeight, _width, pX, pY, plantEnergy);
+	    var planet = {width: _width,x: pX,y: pY, color:color,backColor:backColor,vX: v.vX,vY: v.vY};
 	    universe.addPlanet(planet);
 	}
 
-	var planet4 = {width: 50,x: canvasWidth/2,y: canvasHeight/2,vX: 0,color:'#ff0000',vY: 0,stop:true, density:8};
-	universe.addPlanet(planet4);
+	var sun = {width: 50,x: canvasWidth/2,y: canvasHeight/2,vX: 0,color:'#ff0000',vY: 0,stop:true, density:8};
+	universe.addPlanet(sun);
 
 	var randomSituation = function () {
 	    var planet_num = 20;
@@ -113,7 +131,7 @@
 	};
 
 
-	randomSituation();
+	// randomSituation();
 
 	universe.clear();
 
@@ -2011,7 +2029,6 @@
 	 */
 	Universe.prototype.clear = function () {
 	    this.ctx.fillStyle = this.background;
-	    console.log(this.background);
 	    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 	};
@@ -2029,7 +2046,6 @@
 	        self.run();
 	    });
 	};
-
 
 
 /***/ },
