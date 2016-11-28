@@ -51,6 +51,7 @@
 
 	var canvasId = 'canvas';
 	var universe = new Universe(canvasId);
+	console.log('haha');
 
 	var planet_num = 20;
 	var canvasWidth = 1920;
@@ -245,7 +246,7 @@
 	exports.G = 8;
 	exports.DENSITY = 3;
 	exports.PI = 5;
-	exports.TIME = 0.1;
+	exports.TIME = 0.01;
 	exports.scale = 1;
 
 

@@ -20,6 +20,8 @@ node app.js
 ```
 ## config
 
+you can change the constant to changing the behave of the planets.
+
 ```js
 constant:
     G
@@ -28,4 +30,4 @@ constant:
     TIME
 ```
 
-you can change the constant to changing the behave of planet.
+[demo url](https://wangdashuaihenshuai.github.io/demo/star/)
